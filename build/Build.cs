@@ -44,7 +44,7 @@ partial class Build : NukeBuild
     Target Restore => _ => _
         .Executes(() =>
         {
-
+            DotNetTasks.DotNetRestore();
         });
 
     Target Compile => _ => _
