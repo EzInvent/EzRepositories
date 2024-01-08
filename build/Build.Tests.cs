@@ -27,6 +27,4 @@ partial class Build : ITest
         });
 
     AbsolutePath TestProject => SourceDirectory / "EzRepositories.Tests" / "EzRepositories.Tests.csproj";
-
-    
 }
