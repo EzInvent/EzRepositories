@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 [GitHubActions(
         "run-tests",
         GitHubActionsImage.MacOsLatest,
+        OnPushBranches = new[] { MasterBranch},
         OnPullRequestBranches = new[] { DevelopmentBranch },
         InvokedTargets = new[] { nameof(ITest.RunTests) }
         )]
