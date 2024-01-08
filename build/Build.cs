@@ -6,12 +6,15 @@ using Nuke.Common.Execution;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
+using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Utilities.Collections;
+using Serilog;
+
 using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 
-class Build : NukeBuild
+partial class Build : NukeBuild
 {
     /// Support plugins are available for:
     ///   - JetBrains ReSharper        https://nuke.build/resharper
@@ -21,18 +24,27 @@ class Build : NukeBuild
 
     public static int Main () => Execute<Build>(x => x.Compile);
 
+    const string DevelopmentBranch = "dev";
+    const string MasterBranch = "master";
+
+
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
+    [Solution] readonly Solution Solution;
+
+    AbsolutePath SourceDirectory => RootDirectory / "source";
 
     Target Clean => _ => _
         .Before(Restore)
         .Executes(() =>
         {
+            SourceDirectory.GlobDirectories("*/bin", "*/obj").DeleteDirectories();
         });
 
     Target Restore => _ => _
         .Executes(() =>
         {
+
         });
 
     Target Compile => _ => _
@@ -41,4 +53,5 @@ class Build : NukeBuild
         {
         });
 
+    
 }
