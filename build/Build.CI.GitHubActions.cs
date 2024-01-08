@@ -10,7 +10,7 @@ using System.Threading.Tasks;
         GitHubActionsImage.UbuntuLatest,
         OnPushBranches = new[] { MasterBranch},
         OnPullRequestBranches = new[] { DevelopmentBranch },
-        InvokedTargets = new[] { nameof(ITest.RunTests) }
+        InvokedTargets = new[] { nameof(RunTests) }
         )]
 partial class Build
 {
