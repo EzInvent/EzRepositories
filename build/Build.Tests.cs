@@ -23,7 +23,7 @@ partial class Build : ITest
                 .SetProjectFile(TestProject)
                 .EnableNoBuild()
                 .EnableNoRestore()
-                .SetConfiguration(Configuration.Debug));
+                .SetConfiguration(Configuration));
         });
 
     AbsolutePath TestProject => SourceDirectory / "EzRepositories.Tests" / "EzRepositories.Tests.csproj";

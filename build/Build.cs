@@ -51,6 +51,12 @@ partial class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
+            DotNetBuildSettings buildSettings = new DotNetBuildSettings();
+            buildSettings.SetConfiguration(Configuration);
+            DotNetTasks.DotNetBuild(s => s
+                .SetConfiguration(Configuration)
+                .EnableNoRestore()
+            );
         });
 
     
