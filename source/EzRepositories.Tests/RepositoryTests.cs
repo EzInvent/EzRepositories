@@ -64,6 +64,7 @@ namespace EzRepositories.Tests
             result.Count().Should().Be(expectedResponse.Count());
         }
 
+        [Fact]
         public async Task GetAllAsync_WithFilter_InvalidName_ShouldReturnEmptyList()
         {
             // Arrange

@@ -11,6 +11,11 @@ namespace EzRepositories
     {
         private readonly DbContext _db;
         private readonly DbSet<TEntity> _dbColumn;
+        private static PropertyInfo? getKeyProperty<TEntity>()
+        {
+            return typeof(TEntity).GetProperties()
+                 .LastOrDefault(p => p.IsDefined(typeof(KeyAttribute), true));
+        }
 
         public Repository(DbContext db)
         {
@@ -25,9 +30,9 @@ namespace EzRepositories
             return await _dbColumn.ToListAsync();
         }
 
-        public Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> filter)
+        public async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> filter)
         {
-            throw new NotImplementedException();
+            return await _dbColumn.Where(filter).ToListAsync();
         }
 
         public Task<TEntity> GetAsync(object id)
@@ -35,10 +40,10 @@ namespace EzRepositories
             throw new NotImplementedException();
         }
 
-        private static PropertyInfo? getKeyProperty<TEntity>()
+
+        public Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> filter)
         {
-            return typeof(TEntity).GetProperties()
-                 .LastOrDefault(p => p.IsDefined(typeof(KeyAttribute), true));
+            throw new NotImplementedException();
         }
     }
 }
