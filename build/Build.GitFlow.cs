@@ -27,6 +27,7 @@ partial class Build
             var token = GitHubActions.Token;
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            httpClient.DefaultRequestHeaders.Add("User-Agent", @"Mozilla/5.0 (Windows NT 10; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0");
             var approvalUrl = $"https://api.github.com/repos/{owner}/{RepositoryName}/pulls/{pullRequestNumber}/reviews";
             Log.Information(approvalUrl);
             Log.Information($"Approval Token: {token}");
