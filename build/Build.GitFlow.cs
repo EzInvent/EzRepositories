@@ -27,11 +27,14 @@ partial class Build
             var token = GitHubActions.Token;
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-            httpClient.DefaultRequestHeaders.Add("Content-Type", $"application/json");
 
             var approvalUrl = $"https://api.github.com/repos/{owner}/{RepositoryName}/pulls/{pullRequestNumber}/reviews";
             Log.Information($"Approval Token: {token}");
-            var response = await httpClient.PostAsync(approvalUrl, new StringContent("{\"event\": \"APPROVE\"}"));
+
+            var reviewData = "{\"event\": \"APPROVE\"}";
+            var content = new StringContent(reviewData, Encoding.UTF8, "application/json");
+
+            var response = await httpClient.PostAsync(approvalUrl, content);
 
             if (response.IsSuccessStatusCode)
             {
