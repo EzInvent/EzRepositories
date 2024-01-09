@@ -16,6 +16,7 @@ partial class Build
     GitHubActions GitHubActions => GitHubActions.Instance;
     [GitRepository] readonly GitRepository Repository;
     readonly string RepositoryName = "EzRepositories";
+    readonly string UserAgent = @"Mozilla/5.0 (Windows NT 10; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0";
 
     Target ApproveRequest => _ => _
         .Requires(() => GitHubActions.IsPullRequest)
@@ -26,11 +27,10 @@ partial class Build
             var pullRequestNumber = GitHubActions.PullRequestNumber;
             var token = GitHubActions.Token;
             var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-            httpClient.DefaultRequestHeaders.Add("User-Agent", @"Mozilla/5.0 (Windows NT 10; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0");
             var approvalUrl = $"https://api.github.com/repos/{owner}/{RepositoryName}/pulls/{pullRequestNumber}/reviews";
-            Log.Information(approvalUrl);
-            Log.Information($"Approval Token: {token}");
+
+            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
             var reviewData = "{\"event\": \"APPROVE\"}";
             var content = new StringContent(reviewData, Encoding.UTF8, "application/json");
 
