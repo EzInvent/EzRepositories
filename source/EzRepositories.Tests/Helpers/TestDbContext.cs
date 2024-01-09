@@ -10,16 +10,18 @@ namespace EzRepositories.Tests.Helpers
 {
     public class TestDbContext : DbContext
     {
-        public TestDbContext(DbContextOptions<TestDbContext> options) :base(options) { 
-        
+        public TestDbContext(DbContextOptions<TestDbContext> options) : base(options) {
+
         }
 
         public DbSet<User> Users { get; set; }
-
+        public DbSet<EntityWithNoId> EntityWithNoIds {get;set;}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().HasData(UsersFixtures.GetTestData());
+            modelBuilder.Entity<EntityWithNoId>().HasNoKey();
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

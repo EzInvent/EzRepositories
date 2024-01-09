@@ -1,4 +1,5 @@
-﻿using EzRepositories.Tests.Helpers;
+﻿using Bogus;
+using EzRepositories.Tests.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,14 +12,11 @@ namespace EzRepositories.Tests.Fixture
     {
         public static List<User> GetTestData()
         {
-            return new List<User>()
-            {
-                new User { Id = 1, Name = "John Doe" },
-                new User { Id = 2, Name = "Jane Smith" },
-                new User { Id = 3, Name = "Bob Johnson" },
-                new User { Id = 4, Name = "Alice Williams" },
-                new User { Id = 5, Name = "Charlie Brown" }
-            };
+            var userId = 1;
+            var faker = new Faker<User>()
+                .RuleFor(u => u.Id, _ => userId++)
+                .RuleFor(u => u.Name, _ => $"{_.Name.FirstName()} {_.Name.LastName()}");
+            return faker.Generate(5);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using EzRepositories.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -9,8 +10,8 @@ namespace EzRepositories
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, IEntity
     {
-        private readonly DbContext _db;
-        private readonly DbSet<TEntity> _dbColumn;
+        protected readonly DbContext _db;
+        protected readonly DbSet<TEntity> _dbColumn;
         private static PropertyInfo? getKeyProperty<TEntity>()
         {
             return typeof(TEntity).GetProperties()
@@ -25,25 +26,38 @@ namespace EzRepositories
 
         private PropertyInfo? _idProperty => getKeyProperty<TEntity>();
 
-        public async Task<IEnumerable<TEntity>> GetAllAsync()
+        public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
             return await _dbColumn.ToListAsync();
         }
 
-        public async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> filter)
+        public virtual async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> filter)
         {
             return await _dbColumn.Where(filter).ToListAsync();
         }
 
-        public Task<TEntity> GetAsync(object id)
+        public virtual async Task<TEntity> GetAsync(object id)
         {
-            throw new NotImplementedException();
+            if(_idProperty == null)
+            {
+                throw new InvalidOperationException($"Entity provided ({typeof(TEntity)}) does not have a primary key. Only entities with primary keys could use this method");
+            }
+
+            if(_idProperty.PropertyType != id.GetType())
+            {
+                throw new ArgumentException(
+                $"Provide Id is type of '{id.GetType().Name}', Entity's Id property is of type '{_idProperty.PropertyType.Name}'. Kindly provide an argument of type '{_idProperty.PropertyType.Name}'."
+                    );
+            }
+
+            return await _dbColumn.FindAsync(id);
         }
 
 
-        public Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> filter)
+        public async Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> filter)
         {
-            throw new NotImplementedException();
+            var response = await _dbColumn.FirstOrDefaultAsync(filter);
+            return response;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace EzRepositories.Tests
     public partial class RepositoryTests
     {
         private TestDbContext _db;
-
+        private List<User> _userTestData = UsersFixtures.GetTestData();
 
         public RepositoryTests() { 
             var dbContext = DbContextHelper.CreateInMemoryDbContext();
@@ -22,7 +22,7 @@ namespace EzRepositories.Tests
         public async Task GetAllAsync_ShouldReturnAllUsers()
         {
             // Arrange
-            var expectedResposne = UsersFixtures.GetTestData();
+            var expectedResposne = _userTestData;
             AddUserTestData();
             var repo = new Repository<User>(_db);
 
@@ -54,10 +54,10 @@ namespace EzRepositories.Tests
             // Arrange
             var repo = new Repository<User>(_db);
             AddUserTestData();
-            var expectedResponse = UsersFixtures.GetTestData().Where(user => user.Name.ToLower().Contains("o"));
+            var expectedResponse = _userTestData.Where(user => user.Id > 2);
 
             // Act
-            var result = await repo.GetAllAsync(user => user.Name.ToLower().Contains("o"));
+            var result = await repo.GetAllAsync(user => user.Id > 2);
 
             // Assert
             result.Should().NotBeNull();
@@ -78,9 +78,70 @@ namespace EzRepositories.Tests
             result.Count().Should().Be(0);
         }
 
+        [Fact]
+        public async Task GetAsync_ById_ValidEntity_ShouldReturnUserWithDetail()
+        {
+            // Arrange
+            var repo = new Repository<User>(_db);
+            AddUserTestData();
+            var idToGet = 2;
+
+            // Act
+            var result = await repo.GetAsync(idToGet);
+            // Assert
+            result.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task GetAsync_ById_DifferentIdType_ShouldThrowArgumentException()
+        {
+            // Arrange
+            var repo = new Repository<User>(_db);
+            AddUserTestData();
+            var username = "Somename";
+
+            // Act
+            Func<Task> func = async () => { await repo.GetAsync(username); };
+
+            // Assert
+            await func.Should().ThrowAsync<ArgumentException>()
+                .WithMessage("*Int32*")
+                .WithMessage("*String*");
+        }
+
+        [Fact]
+        public async Task GetAsync_ById_EntityWithNoId_ShouldInvalidOperationException()
+        {
+            // Arrange
+            var repo = new Repository<EntityWithNoId>(_db);
+            var testData = EntityWithNoIdFixtures.GetTestData();
+            var name = "name";
+
+            // Act
+            Func<Task> func = async () => { await repo.GetAsync(name); };
+            //Assert
+            await func.Should().ThrowAsync<InvalidOperationException>();
+        }
+
+        [Fact]
+        public async Task GetAsync_ByFilter_ValidData_ShouldReturnResult()
+        {
+            // Arrange
+            var repo = new Repository<User>(_db);
+            var testData = UsersFixtures.GetTestData();
+            AddUserTestData();
+
+            // Act
+            var result = await repo.GetAsync(e => e.Name.Length > 4);
+            var results = await repo.GetAllAsync();
+            //Assert
+            result.Should().NotBeNull();
+            result.Name.Length.Should().BeGreaterThan(4);
+        }
+
         private void AddUserTestData()
         {
-            _db.Users.AddRange(UsersFixtures.GetTestData());
+            _db.Users.AddRange(_userTestData);
             _db.SaveChanges();
         }
     }
