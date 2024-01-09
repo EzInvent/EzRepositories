@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,8 +26,9 @@ partial class Build
             var pullRequestNumber = GitHubActions.PullRequestNumber;
             var token = GitHubActions.Token;
             var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Add("authorization", $"Bearer {token}");
-            httpClient.DefaultRequestHeaders.Add("content-type", $"application/json");
+            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            httpClient.DefaultRequestHeaders.Add("Content-Type", $"application/json");
+
             var approvalUrl = $"https://api.github.com/repos/{owner}/{RepositoryName}/pulls/{pullRequestNumber}/reviews";
             Log.Information($"Approval Token: {token}");
             var response = await httpClient.PostAsync(approvalUrl, new StringContent("{\"event\": \"APPROVE\"}"));
