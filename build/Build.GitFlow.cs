@@ -41,6 +41,8 @@ partial class Build
             }
             else
             {
+                var resstr = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                Log.Information(resstr);
                 Assert.Fail($"Failed to approve pull request #{pullRequestNumber}. Status code: {response.StatusCode}");
             }
             
