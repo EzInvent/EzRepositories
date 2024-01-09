@@ -25,9 +25,10 @@ partial class Build
             var pullRequestNumber = GitHubActions.PullRequestNumber;
             var token = GitHubActions.Token;
             var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            httpClient.DefaultRequestHeaders.Add("authorization", $"Bearer {token}");
+            httpClient.DefaultRequestHeaders.Add("content-type", $"application/json");
             var approvalUrl = $"https://api.github.com/repos/{owner}/{RepositoryName}/pulls/{pullRequestNumber}/reviews";
-
+            Log.Information($"Approval Token: {token}");
             var response = await httpClient.PostAsync(approvalUrl, new StringContent("{\"event\": \"APPROVE\"}"));
 
             if (response.IsSuccessStatusCode)
@@ -36,7 +37,7 @@ partial class Build
             }
             else
             {
-                Log.Error($"Failed to approve pull request #{pullRequestNumber}. Status code: {response.StatusCode}");
+                Assert.Fail($"Failed to approve pull request #{pullRequestNumber}. Status code: {response.StatusCode}");
             }
             
         });
