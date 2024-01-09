@@ -30,7 +30,6 @@ partial class Build
 
             var approvalUrl = $"https://api.github.com/repos/{owner}/{RepositoryName}/pulls/{pullRequestNumber}/reviews";
             Log.Information($"Approval Token: {token}");
-
             var reviewData = "{\"event\": \"APPROVE\"}";
             var content = new StringContent(reviewData, Encoding.UTF8, "application/json");
 

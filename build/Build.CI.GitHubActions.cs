@@ -16,7 +16,8 @@ using System.Threading.Tasks;
         "approve-pull",
         GitHubActionsImage.UbuntuLatest,
         OnPullRequestBranches = new[] { DevelopmentBranch, MasterBranch },
-        InvokedTargets = new[] { nameof(ApproveRequest) }
+        InvokedTargets = new[] { nameof(ApproveRequest) },
+        EnableGitHubToken = true
         )]
 partial class Build
 {
