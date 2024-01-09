@@ -12,6 +12,12 @@ using System.Threading.Tasks;
         OnPullRequestBranches = new[] { DevelopmentBranch },
         InvokedTargets = new[] { nameof(RunTests) }
         )]
+[GitHubActions(
+        "approve-pull",
+        GitHubActionsImage.UbuntuLatest,
+        OnPullRequestBranches = new[] { DevelopmentBranch, MasterBranch },
+        InvokedTargets = new[] { nameof(ApproveRequest) }
+        )]
 partial class Build
 {
 }

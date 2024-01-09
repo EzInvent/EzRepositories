@@ -58,6 +58,4 @@ partial class Build : NukeBuild
                 .EnableNoRestore()
             );
         });
-
-    
 }
