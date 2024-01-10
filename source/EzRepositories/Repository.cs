@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices;
 
 namespace EzRepositories
 {
@@ -36,7 +37,7 @@ namespace EzRepositories
             return await _dbColumn.Where(filter).ToListAsync();
         }
 
-        public virtual async Task<TEntity> GetAsync(object id)
+        public async Task<TEntity> GetAsync(object id)
         {
             if(_idProperty == null)
             {
@@ -89,6 +90,39 @@ namespace EzRepositories
             }
 
             return updatedEntity.Entity;
+        }
+
+        public async Task<bool> DeleteAsync(object id)
+        {
+            var entity = await GetAsync(id);
+            if(entity == null)
+            {
+                return false;
+            }
+
+            _dbColumn.Remove(entity);
+           var affectedRows =  _db.SaveChanges();
+            return affectedRows > 0;
+        }
+
+        public Task<bool> DeleteAsync(TEntity entity)
+        {
+            _dbColumn.Remove(entity);
+            var affectedRows = _db.SaveChanges();
+            return Task.FromResult(affectedRows > 0);
+        }
+
+        public async Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> filter)
+        {
+            var entity = await GetAsync(filter);
+            if(entity == null)
+            {
+                return false;
+            }
+
+            _dbColumn.Remove(entity);
+            var affectedRows = _db.SaveChanges();
+            return affectedRows > 0;
         }
     }
 }

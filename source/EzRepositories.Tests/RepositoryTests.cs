@@ -175,6 +175,81 @@ namespace EzRepositories.Tests
             result.Name.Should().Be(userToUpdate.Name);
         }
 
+        [Fact]
+        public async Task DeleteAsync_ValidId_ShouldBeTrue()
+        {
+            var repo = new Repository<User>(_db);
+            AddUserTestData();
+            var currentDataCount = (await repo.GetAllAsync()).Count();
+            var IdToDelete = (await repo.GetAllAsync()).First().Id;
+
+            // Act 
+            var result = await repo.DeleteAsync(IdToDelete);
+
+            // Assert
+            result.Should().BeTrue();
+            var newDataCount = (await repo.GetAllAsync()).Count();
+            newDataCount.Should().Be(currentDataCount - 1);
+        }
+
+        [Fact]
+        public async Task DeleteAsync_ById_IdArgumentofDifferentType_ShouldThrowArgumentException()
+        {
+            // Arrange
+            var repo = new Repository<User>(_db);
+            AddUserTestData();
+            var currentDataCount = (await repo.GetAllAsync()).Count();
+            var IdToDelete = "idToDelete";
+
+            // Act 
+            Func<Task> func = async () => await repo.DeleteAsync(IdToDelete);
+
+            // Assert
+            await func.Should().ThrowAsync<ArgumentException>();
+        }
+        [Fact]
+        public async Task DeleteAsync_ByFilter_ValidValues_ShouldBeTrue()
+        {
+            // Arrange 
+            var repo = new Repository<User>(_db);
+            AddUserTestData();
+
+            // Act
+            var result = await repo.DeleteAsync(e => e.Id > 4);
+
+            // Assert
+            result.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task DeleteAsync_EntityNotFound_ShouldReturnFalse()
+        {
+            // Arrange 
+            var repo = new Repository<User>(_db);
+            AddUserTestData();
+
+            // Act
+            var result = await repo.DeleteAsync(e => e.Id == -1);
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task DeleteAsync_ByEntity_ShouldReturnTrue()
+        {// Arrange 
+            var repo = new Repository<User>(_db);
+            AddUserTestData();
+            var entityToDelete = (await repo.GetAllAsync()).First();
+
+            // Act
+            var result = await repo.DeleteAsync(entityToDelete);
+
+            // Assert
+            result.Should().BeTrue();
+
+        }
+
         private void AddUserTestData()
         {
             _db.Users.AddRange(_userTestData);

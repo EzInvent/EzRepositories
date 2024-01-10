@@ -17,5 +17,8 @@ namespace EzRepositories
 
         Task<TEntity> CreateAsync(TEntity entity);
         Task<TEntity> UpdateAsync(TEntity entity);
+        Task<bool> DeleteAsync(object id);
+        Task<bool> DeleteAsync(TEntity entity);
+        Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> filter);
     }
 }
