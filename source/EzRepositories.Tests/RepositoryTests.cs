@@ -133,10 +133,46 @@ namespace EzRepositories.Tests
 
             // Act
             var result = await repo.GetAsync(e => e.Name.Length > 4);
-            var results = await repo.GetAllAsync();
             //Assert
             result.Should().NotBeNull();
             result.Name.Length.Should().BeGreaterThan(4);
+        }
+
+        [Fact]
+        public async Task CreateAsync_ValidEntity_ShouldReturnCreatedEntity()
+        {
+            // Arrange 
+            var repo = new Repository<User>(_db);
+            var UserToAdd = new User
+            {
+                Name = "James Johnson"
+            };
+
+            // Act
+            var result = await repo.CreateAsync(UserToAdd);
+
+            //Assert
+            result.Should().NotBeNull();
+            result.Id.Should().BeGreaterThan(0);
+            result.Name.Should().Be(UserToAdd.Name);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_ValidEntity_ShouldReturnUpdatedEntity()
+        {
+            var repo = new Repository<User>(_db);
+            AddUserTestData();
+            var userToUpdate = (await repo.GetAllAsync()).First();
+
+            userToUpdate.Name = "James Johnson";
+
+            // Act 
+            var result = await repo.UpdateAsync(userToUpdate);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Id.Should().Be(userToUpdate.Id);
+            result.Name.Should().Be(userToUpdate.Name);
         }
 
         private void AddUserTestData()

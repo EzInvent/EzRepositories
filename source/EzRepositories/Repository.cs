@@ -53,11 +53,42 @@ namespace EzRepositories
             return await _dbColumn.FindAsync(id);
         }
 
-
         public async Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> filter)
         {
             var response = await _dbColumn.FirstOrDefaultAsync(filter);
             return response;
+        }
+
+        protected virtual Task<TEntity> OnBeforeCreating(TEntity entity) { return Task.FromResult(entity);}
+
+        public async Task<TEntity> CreateAsync(TEntity entity)
+        {
+            entity = await OnBeforeCreating(entity);
+
+            var createdEntity = await _dbColumn.AddAsync(entity);
+            var affectedRows = await _db.SaveChangesAsync();
+            if(affectedRows < 1)
+            {
+                return null;
+            }
+
+            return createdEntity.Entity;
+        }
+
+        protected virtual Task<TEntity> OnBeforeUpdating(TEntity entity) { return Task.FromResult(entity); }
+
+        public async Task<TEntity> UpdateAsync(TEntity entity)
+        {
+            entity = await OnBeforeUpdating(entity);
+
+            var updatedEntity = _dbColumn.Update(entity);
+            var affectedRows = await _db.SaveChangesAsync();
+            if(affectedRows < 1)
+            {
+                return null;
+            }
+
+            return updatedEntity.Entity;
         }
     }
 }

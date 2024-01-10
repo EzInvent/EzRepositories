@@ -14,5 +14,8 @@ namespace EzRepositories
         Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> filter);
         Task<TEntity> GetAsync(object id);
         Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> filter);
+
+        Task<TEntity> CreateAsync(TEntity entity);
+        Task<TEntity> UpdateAsync(TEntity entity);
     }
 }
