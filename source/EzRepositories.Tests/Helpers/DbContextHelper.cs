@@ -13,7 +13,7 @@ namespace EzRepositories.Tests.Helpers
         public static TestDbContext CreateInMemoryDbContext()
         {
             var options = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<TestDbContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase")
+                .UseInMemoryDatabase(databaseName: $"TestDatabase-{Guid.NewGuid()}")
                 .Options;
 
             return new TestDbContext(options);

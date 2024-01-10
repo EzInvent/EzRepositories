@@ -252,6 +252,10 @@ namespace EzRepositories.Tests
 
         private void AddUserTestData()
         {
+            if (_db.Users.Any())
+            {
+                return;
+            }
             _db.Users.AddRange(_userTestData);
             _db.SaveChanges();
         }
