@@ -19,6 +19,13 @@ using System.Threading.Tasks;
         InvokedTargets = new[] { nameof(ApproveRequest) },
         EnableGitHubToken = true
         )]
+[GitHubActions(
+    "close-issue",
+    GitHubActionsImage.MacOsLatest,
+    OnPushBranches = new[] { DevelopmentBranch},
+    InvokedTargets = new[] { nameof(CloseIssueOnDevPush) },
+    EnableGitHubToken = true
+    )]
 partial class Build
 {
 }
