@@ -1,6 +1,10 @@
-﻿using Nuke.Common;
+﻿using Dtos;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Bson;
+using Nuke.Common;
 using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Git;
+using Nuke.Common.Tools.Git;
 using Nuke.Common.Tools.GitHub;
 using Serilog;
 using System;
@@ -48,4 +52,84 @@ partial class Build
             }
             
         });
+
+    Target CloseIssueOnDevPush => _ => _
+        .Executes(async () =>
+        {
+            var owner = Repository.GetGitHubOwner();
+            var issueNumber = getIssueNumberIfMerge();
+            if(string.IsNullOrEmpty(issueNumber))
+            {
+                Log.Information("No issue found to close");
+                return;
+            }
+
+            var token = GitHubActions.Token;
+            var httpClient = new HttpClient();
+            var issueClosureUrl = $"https://api.github.com/repos/{owner}/{RepositoryName}/issues/{issueNumber}";
+            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
+
+            var closeIssueRequest = new CloseIssueRequest()
+            {
+                State = "closed",
+                State_Reason = "completed"
+            };
+            var payload = JsonConvert.SerializeObject(closeIssueRequest).ToLower(); ;
+
+            var response = await httpClient.PatchAsync(issueClosureUrl, new StringContent(payload, Encoding.UTF8, "application/json"));
+            if (response.IsSuccessStatusCode)
+            {
+                Log.Information($"issue #{issueNumber} closed Successfully");
+            }
+            else
+            {
+                var resstr = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                Log.Information(resstr);
+                Log.Information($"Failed to close issue: #{issueNumber}. Kindly close Manually");
+            }
+        });
+
+    private string getIssueNumberIfMerge()
+    {
+        var issueNumber = string.Empty;
+        var title = GitTasks.Git("log --format=%B -n 1", logOutput: false).FirstOrDefault().Text;
+
+        if (isMergePullRequest(title))
+        {
+            issueNumber = extractIssueNumberFromTitle(title);
+            if(!isValidIssueNumber(issueNumber))
+            {
+                issueNumber = string.Empty;
+            }
+
+        }
+
+        return issueNumber;
+    }
+
+    private bool isMergePullRequest(string title)
+    {
+        return title.ToLower().Contains("merge pull");
+    }
+
+    private string extractIssueNumberFromTitle(string title)
+    {
+        var issueContent = title.Split(' ')
+                            .FirstOrDefault(s => s.Contains("EzInvent/"))
+                            .ToLower();
+
+        var issueNumber = issueContent?
+                        .Replace("ezinvent/", string.Empty)
+                        .Replace("feature/", string.Empty)
+                        .Replace("hotifix/", string.Empty)
+                        .Replace("bug/", string.Empty);
+
+        return issueNumber.Split("-").FirstOrDefault();
+    }
+
+    private bool isValidIssueNumber(string issueNumber)
+    {
+        return int.TryParse(issueNumber, out _);
+    }
 }
