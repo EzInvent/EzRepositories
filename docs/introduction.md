@@ -22,7 +22,7 @@ To get started with EzRepositories, head over to [Getting Started](./01-Getting-
 
 ## Contribution {contribution}
 
-EzRepositories is an open-source project, and we welcome contributions. If you encounter issues, have feature requests, or would like to contribute, check out our [Contribution Guidelines](./05-Contribution-Guidlines) section.
+EzRepositories is an open-source project, and we welcome contributions. If you encounter issues, have feature requests, or would like to contribute, check out our [Contribution Guidelines](./03-Contribution-Guidlines) section.
 
 
 Thank you for choosing EzRepositories. Happy Coding!

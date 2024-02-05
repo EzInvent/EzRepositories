@@ -32,4 +32,3 @@ dotnet add package Microsoft.EntityFrameworkCore
 
 
 For more detailed information on getting started, proceed to the [Quick Start](./02-Quick-Start.md) guide.
-0
